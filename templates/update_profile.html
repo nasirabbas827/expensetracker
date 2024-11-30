@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Update Profile | Budget Tracker{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        .profile-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-header h2 {
+            color: #3498db;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .profile-form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .current-profile-picture {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .current-profile-picture img {
+            max-width: 150px;
+            border-radius: 50%;
+            border: 3px solid #3498db;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+        }
+
+        .file-input-wrapper .btn {
+            display: inline-block;
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+{% endblock css %}
+
+{% block content %}
+    <div class="profile-container">
+        <div class="profile-header">
+            <h2><i class="fas fa-user-edit mr-2"></i>Update Profile</h2>
+        </div>
+        
+        {% if user_profile.profile_picture %}
+            <div class="current-profile-picture">
+                {% for image in user_profile.profile_picture.all %}
+                    <img src="./profile_pic/{{ image }}" alt="Profile Picture">
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data" class="profile-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <div class="form-group">
+                <label for="id_profile_picture">Profile Picture</label>
+                <div class="file-input-wrapper">
+                    <button class="btn btn-secondary"><i class="fas fa-upload mr-2"></i>Choose File</button>
+                    <input type="file" name="profile_picture" accept="image/*" id="id_profile_picture">
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn"><i class="fas fa-save mr-2"></i>Update Profile</button>
+                <a href="{% url 'view_profile' %}" class="btn btn-secondary"><i class="fas fa-eye mr-2"></i>View Profile</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+

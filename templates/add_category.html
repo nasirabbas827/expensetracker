@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Category{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary">Add Category</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Category</button>
+    <a href="{% url 'view_categories' %}" class="btn btn-outline-secondary">Back to Categories</a>
+
+    </form>
+</div>
+{% endblock content %}

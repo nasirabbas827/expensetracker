@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Budget History
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Budget History</h2>
+    <table class="table table-bordered">
+    <a href="{% url 'add_budget' %}" class="btn btn-success float-right mb-3">Add New Budget</a>
+
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Month/Year</th>
+                <th>Remaining Budget</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+            <tr class="{% if budget.remaining_budget == 'Exceeded' %}table-danger{% elif budget.remaining_budget == 'Warning' %}table-warning{% endif %}">
+                <td>{{ budget.category.name }}</td>
+                <td>${{ budget.amount }}</td>
+                <td>{{ budget.month }}/{{ budget.year }}</td>
+                <td>
+                    {% if budget.remaining_budget == 'Exceeded' %}
+                        <strong class="text-danger">Exceeded</strong>
+                    {% elif budget.remaining_budget == 'Warning' %}
+                        <strong class="text-warning">Warning: Nearing Limit</strong>
+                    {% else %}
+                        <strong class="text-success">Safe</strong>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if budget.remaining_budget == 'Exceeded' %}
+                        <strong class="text-danger">${{ budget.remaining_budget_value }}</strong>
+                    {% elif budget.remaining_budget == 'Warning' %}
+                        <strong class="text-warning">${{ budget.remaining_budget_value }}</strong>
+                    {% else %}
+                        <strong class="text-success">${{ budget.remaining_budget_value }}</strong>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'edit_budget' budget.budget_id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_budget' budget.budget_id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No budget records available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Income{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Add Income</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Income</button>
+    <a href="{% url 'view_income' %}" class="btn btn-outline-secondary">Back to Income History</a>
+
+    </form>
+</div>
+{% endblock content %}

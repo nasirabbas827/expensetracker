@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Income History{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Income History</h2>
+
+    <!-- Search and Filter Form -->
+    <form method="GET" class="mb-3">
+        <div class="row">
+            <!-- Date Range Filter -->
+            <div class="col-md-3">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-3">
+                <label for="end_date" class="form-label">End Date</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date }}">
+            </div>
+            <!-- Amount Range Filter -->
+            <div class="col-md-3">
+                <label for="min_amount" class="form-label">Min Amount</label>
+                <input type="number" name="min_amount" id="min_amount" class="form-control" value="{{ request.GET.min_amount }}" step="0.01">
+            </div>
+            <div class="col-md-3">
+                <label for="max_amount" class="form-label">Max Amount</label>
+                <input type="number" name="max_amount" id="max_amount" class="form-control" value="{{ request.GET.max_amount }}" step="0.01">
+            </div>
+        </div>
+        <!-- Search by Source -->
+        <div class="row mt-3">
+            <div class="col-md-3">
+                <label for="source" class="form-label">Search by Source</label>
+                <input type="text" name="source" id="source" class="form-control" value="{{ request.GET.source }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Apply Filters</button>
+        <a href="{% url 'export_income_csv' %}" class="btn btn-success mt-3">Export to CSV</a>
+
+    </form>
+
+    <!-- Export Options -->
+
+    <table class="table table-bordered">
+        <a href="{% url 'add_income' %}" class="btn btn-success float-right mb-3">Add Income</a>
+
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Source</th>
+                <th>Amount</th>
+                <th>Note</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for income in incomes %}
+            <tr>
+                <td>{{ income.date }}</td>
+                <td>{{ income.source }}</td>
+                <td>${{ income.amount }}</td>
+                <td>{{ income.note }}</td>
+                <td>
+                    <a href="{% url 'edit_income' income.income_id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_income' income.income_id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No income records available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

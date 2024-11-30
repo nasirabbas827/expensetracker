@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard | Budget Tracker
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .dashboard-header {
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-header h1 {
+        color: #343a40;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-header p {
+        color: #6c757d;
+    }
+
+    .card-container {
+        margin-bottom: 30px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-header {
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        font-weight: bold;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+    }
+
+    .card-text {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .chart-container {
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-title {
+        color: #343a40;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .alert-custom {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="dashboard-header">
+        <h1 class="display-4"><i class="fas fa-chart-line mr-3"></i>Your Financial Dashboard</h1>
+        <p class="lead">Get a comprehensive view of your finances and make informed decisions.</p>
+    </div>
+
+    <div class="row">
+        <!-- Total Income Card -->
+        <div class="col-md-4 card-container">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header"><i class="fas fa-money-bill-wave mr-2"></i>Income</div>
+                <div class="card-body">
+                    <h5 class="card-title">Total Income</h5>
+                    <p class="card-text">${{ total_income|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Expenses Card -->
+        <div class="col-md-4 card-container">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header"><i class="fas fa-receipt mr-2"></i>Expenses</div>
+                <div class="card-body">
+                    <h5 class="card-title">Total Expenses</h5>
+                    <p class="card-text">${{ total_expenses|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Savings Card -->
+        <div class="col-md-4 card-container">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header"><i class="fas fa-piggy-bank mr-2"></i>Savings</div>
+                <div class="card-body">
+                    <h5 class="card-title">Total Savings</h5>
+                    <p class="card-text">${{ total_savings|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts for Budget Exceeding or Warning -->
+    {% if alerts %}
+        <div class="alert alert-warning alert-custom" role="alert">
+            <h4 class="alert-heading"><i class="fas fa-exclamation-triangle mr-2"></i>Financial Alerts</h4>
+            <ul class="mb-0">
+                {% for alert in alerts %}
+                    <li>{{ alert }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Charts Section -->
+    <div class="row">
+        <!-- Category-Wise Distribution Pie Chart -->
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h3 class="chart-title"><i class="fas fa-chart-pie mr-2"></i>Expense Distribution by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Month-on-Month Spending Bar Chart -->
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h3 class="chart-title"><i class="fas fa-chart-bar mr-2"></i>Monthly Spending Trend</h3>
+                <canvas id="monthlySpendingChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Pie Chart for Category-Wise Distribution
+    var ctxCategory = document.getElementById('categoryChart').getContext('2d');
+    var categoryChart = new Chart(ctxCategory, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for category in categories %}'{{ category.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for category in categories %}{{ category.total_expenses }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#FF9F40', '#C5E1A5', '#9C27B0', '#795548'],
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                title: {
+                    display: true,
+                    text: 'Expense Distribution'
+                }
+            }
+        }
+    });
+
+    // Bar Chart for Month-on-Month Spending
+    var ctxMonthly = document.getElementById('monthlySpendingChart').getContext('2d');
+    var monthlySpendingChart = new Chart(ctxMonthly, {
+        type: 'bar',
+        data: {
+            labels: [{% for month in months %}'{{ month.date__month }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Monthly Spending',
+                data: [{% for month in months %}{{ month.spending }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: '#36A2EB',
+                borderColor: '#2196F3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount ($)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Spending Trend'
+                }
+            }
+        }
+    });
+</script>
+{% endblock content %}
+
