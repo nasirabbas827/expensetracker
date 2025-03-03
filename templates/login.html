@@ -51,6 +51,9 @@
 {% endblock css %}
 {% block content %}
   <div class="container">
+    <div class="card mx-auto" style="max-width: 600px;">
+      <div class="card-body">
+
     <h2>Login</h2>
     {% if form.errors %}
       <div class="alert alert-danger" role="alert">
@@ -69,5 +72,7 @@
       </div>
       <button type="submit" class="btn btn-primary">Login</button>
     </form>
+  </div>
+  </div>
   </div>
 {% endblock %}
