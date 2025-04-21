@@ -73,7 +73,7 @@ def dashboard(request):
         remaining_budget = budget.amount - total_spent
         if remaining_budget < 0:
             alerts.append(f"Budget for {budget.category.name} exceeded!")
-        elif remaining_budget < budget.amount * 0.1:
+        elif remaining_budget < budget.amount * 0:
             alerts.append(f"Warning: You're nearing the budget for {budget.category.name}.")
 
     return render(request, 'dashboard.html', {
@@ -495,8 +495,8 @@ def view_budget(request):
         # Set the budget status
         if remaining_budget < 0:
             budget.remaining_budget = 'Exceeded'
-        elif remaining_budget <= budget.amount * 0.1:
-            budget.remaining_budget = 'Warning'  # Nearing budget limit (10%)
+        elif remaining_budget <= budget.amount * 0:
+            budget.remaining_budget = 'Warning' 
         else:
             budget.remaining_budget = 'Safe'  # Within the budget
         
